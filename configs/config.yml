@@ -1,0 +1,14 @@
+isar:
+  url: git@github.com:vj-kumar/isar.git
+  upstream: https://github.com/ilbers/isar.git
+  mail: isar-users@googlegroups.com
+
+jailhouse:
+  url: git@github.com:vj-kumar/jailhouse.git
+  upstream: https://github.com/siemens/jailhouse.git
+  mail: jailhouse-dev@googlegroups.com
+
+jailhouse-images:
+  url: git@github.com:vj-kumar/jailhouse-images.git
+  upstream: https://github.com/siemens/jailhouse-images.git
+  mail: jailhouse-dev@googlegroups.com
