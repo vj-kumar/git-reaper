@@ -1,5 +1,5 @@
 TODO:
 -----
-1. Provision to sync sources with upstream
-2. Provision to send patches to mailing list
-3. Provision to switch between gitconfigs
+1. Provision to send patches to mailing list
+2. Provision to switch between gitconfigs
+3. Provision to specify URL & upstream instead of project & config
