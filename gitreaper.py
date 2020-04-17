@@ -26,6 +26,14 @@ def directoryAs(path):
         os.chdir(oldpwd)
 
 
+def confirm_user(question):
+    reply = input(question).strip()
+    if reply == "YES":
+        return True
+    else:
+        return False
+
+
 def get_temp_dir(project):
         return tempfile.mkdtemp(prefix=('gitreaper-'+ project + '-'))
 
@@ -66,11 +74,22 @@ class GitReaper(object):
         with open(os.path.abspath(configfile)) as file:
             return yaml.load(file, Loader=yaml.FullLoader)
 
-    def sync(self, configfile, project):
+    def sync(self, configfile, project, reverse):
         ymlconfig = ""
         ymlconfig = self.parseConfigFile(configfile)
         upstream_repo = ymlconfig[project]['upstream']
         downstream_repo = ymlconfig[project]['url']
+
+        if reverse:
+            upstream_repo = ymlconfig[project]['url']
+            downstream_repo = ymlconfig[project]['upstream']
+            print("="*30)
+            print("CAUTION: REVERSE PUSH DETECTED")
+            print("="*30)
+            question = upstream_repo + "==>" + \
+                      downstream_repo + " YES/NO: "
+            if not confirm_user(question):
+                sys.exit("sync aborted")
 
         if "branches" in ymlconfig[project]:
             sync_specific_branches(project, upstream_repo, downstream_repo,
@@ -97,9 +116,13 @@ def main():
                                 help="Sync fork with upstream",
                                 action='store_true',
                                 required=False)
+    parser.add_argument("-R", "--reverse",
+                                help="Reverse sync direction. Sync downstream to upstream",
+                                action='store_true',
+                                required=False)
     args = parser.parse_args()
     if args.sync:
-        reaper.sync(args.config_file, args.project)
+        reaper.sync(args.config_file, args.project, args.reverse)
 
 if __name__ == "__main__":
     main()
