@@ -12,3 +12,16 @@ jailhouse-images:
   url: git@github.com:vj-kumar/jailhouse-images.git
   upstream: https://github.com/siemens/jailhouse-images.git
   mail: jailhouse-dev@googlegroups.com
+
+linux-shakti:
+  url: git@github.com:vj-kumar/linux-shakti.git
+  upstream: https://github.com/torvalds/linux.git
+  mail: shakti-sw@googlegroups.com
+
+opensbi:
+  url: git@github.com:vj-kumar/opensbi.git
+  upstream: https://github.com/riscv/opensbi.git
+
+uboot:
+  url: git@github.com:vj-kumar/u-boot.git
+  upstream: https://github.com/u-boot/u-boot.git
