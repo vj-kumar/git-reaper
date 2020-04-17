@@ -3,3 +3,4 @@ TODO:
 1. Provision to send patches to mailing list
 2. Provision to switch between gitconfigs
 3. Provision to specify URL & upstream instead of project & config
+4. Disable force sync by default. Get it via an option.
