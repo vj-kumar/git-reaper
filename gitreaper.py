@@ -35,7 +35,7 @@ class GitReaper(object):
 
     def sync(self, configfile, project):
         ymlconfig = ""
-        tempdir = tempfile.mkdtemp(prefix='gitreaper-')
+        tempdir = tempfile.mkdtemp(prefix=('gitreaper-'+ project + '-'))
         ymlconfig = self.parseConfigFile(configfile)
         with self.directoryAs(tempdir):
             cmd = 'git clone --mirror ' + ymlconfig[project]['upstream'] + ' .'
