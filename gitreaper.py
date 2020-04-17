@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-# Author: Vijai Kumar K <vijaikumar.kanagarajan@gmail.com>
+#
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# Copyright 2020, Vijai Kumar K
+#
+# Author:
+#  Vijai Kumar K <vijaikumar.kanagarajan@gmail.com>
+#
 # Dt: 13 Feb 2020
 #        ...
 #       |0 0|
