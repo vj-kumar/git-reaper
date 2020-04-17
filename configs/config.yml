@@ -21,6 +21,7 @@ linux-shakti:
 opensbi:
   url: git@github.com:vj-kumar/opensbi.git
   upstream: https://github.com/riscv/opensbi.git
+  branches: [ master ]
 
 uboot:
   url: git@github.com:vj-kumar/u-boot.git

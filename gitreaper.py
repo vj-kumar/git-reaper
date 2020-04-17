@@ -16,6 +16,48 @@ import subprocess
 from argparse import ArgumentParser
 from contextlib import contextmanager
 
+@contextmanager
+def directoryAs(path):
+    oldpwd=os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)
+
+
+def get_temp_dir(project):
+        return tempfile.mkdtemp(prefix=('gitreaper-'+ project + '-'))
+
+
+def clean_temp_dir(tempdir):
+        shutil.rmtree(tempdir)
+
+
+def sync_entire_repo(project, upstream, downstream):
+    tempdir=get_temp_dir(project)
+    with directoryAs(tempdir):
+        cmd = 'git clone --mirror ' + upstream + ' .'
+        subprocess.call(cmd, shell=True)
+        cmd = 'git push -f -u ' + downstream
+        subprocess.call(cmd + " --all", shell=True)
+        subprocess.call(cmd + " --tags", shell=True)
+    clean_temp_dir(tempdir)
+
+
+def sync_specific_branches(project, upstream, downstream, branches):
+    tempdir=get_temp_dir(project)
+    with directoryAs(tempdir):
+        cmd = 'git clone ' + upstream + ' .'
+        subprocess.call(cmd, shell=True)
+        for branch in branches:
+            cmd = 'git checkout ' + branch
+            subprocess.call(cmd, shell=True)
+            cmd = 'git push -f -u ' + downstream + ' ' + branch
+            subprocess.call(cmd, shell=True)
+    clean_temp_dir(tempdir)
+
+
 class GitReaper(object):
     def __init__(self):
         return
@@ -24,29 +66,21 @@ class GitReaper(object):
         with open(os.path.abspath(configfile)) as file:
             return yaml.load(file, Loader=yaml.FullLoader)
 
-    @contextmanager
-    def directoryAs(self, path):
-        oldpwd=os.getcwd()
-        os.chdir(path)
-        try:
-            yield
-        finally:
-            os.chdir(oldpwd)
-
     def sync(self, configfile, project):
         ymlconfig = ""
-        tempdir = tempfile.mkdtemp(prefix=('gitreaper-'+ project + '-'))
         ymlconfig = self.parseConfigFile(configfile)
-        with self.directoryAs(tempdir):
-            cmd = 'git clone --mirror ' + ymlconfig[project]['upstream'] + ' .'
-            subprocess.call(cmd, shell=True)
-            cmd = 'git push -f -u ' + ymlconfig[project]['url']
-            subprocess.call(cmd + " --all", shell=True)
-            subprocess.call(cmd + " --tags", shell=True)
-        shutil.rmtree(tempdir)
+        upstream_repo = ymlconfig[project]['upstream']
+        downstream_repo = ymlconfig[project]['url']
+
+        if "branches" in ymlconfig[project]:
+            sync_specific_branches(project, upstream_repo, downstream_repo,
+                                   ymlconfig[project]['branches'])
+        else:
+            sync_entire_repo(project, upstream_repo, downstream_repo)
 
     def sendPatchUpstream(self, configfile, project):
         return
+
 
 def main():
     reaper = GitReaper()
