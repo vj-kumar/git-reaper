@@ -61,7 +61,9 @@ def sync_entire_repo(project, upstream, downstream):
     clean_temp_dir(tempdir)
 
 
-def sync_specific_branches(project, upstream, downstream, branches, force=False):
+def sync_specific_branches(
+    project, upstream, downstream, branches, force=False
+):
     tempdir = get_temp_dir(project)
     with directoryAs(tempdir):
         cmd = "git clone " + upstream + " ."
@@ -97,7 +99,8 @@ class GitReaper(object):
         if reverse:
             if "reverse" not in flags:
                 print(
-                    "set 'flags: [reverse]' for {} if you want to sync from downstream to upstream".format(
+                    "set 'flags: [reverse]' " +
+                    "for {} to sync from downstream to upstream".format(
                         project
                     )
                 )
@@ -112,7 +115,7 @@ class GitReaper(object):
             try:
                 if not confirm_user(question):
                     sys.exit("sync aborted")
-            except:
+            except KeyboardInterrupt:
                 sys.exit("\nsync aborted")
 
         if "branches" in ymlconfig[project]:
@@ -127,7 +130,7 @@ class GitReaper(object):
             try:
                 if not confirm_user(question):
                     sys.exit("sync aborted")
-            except:
+            except KeyboardInterrupt:
                 sys.exit("\nsync aborted")
             sync_specific_branches(
                 project,
@@ -163,12 +166,18 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sync", help="Sync fork with upstream", action="store_true", required=False
+        "--sync",
+        help="Sync fork with upstream",
+        action="store_true",
+        required=False,
     )
     parser.add_argument(
         "-R",
         "--reverse",
-        help="Reverse sync direction. Sync downstream to upstream. It requires reverse to be set in flags field.",
+        help="""Reverse sync direction.
+                Sync downstream to upstream.
+                It requires reverse to be set in flags field.
+                """,
         action="store_true",
         required=False,
     )
