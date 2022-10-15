@@ -90,9 +90,10 @@ class GitReaper(object):
         if reverse:
             upstream_repo = ymlconfig[project]['url']
             downstream_repo = ymlconfig[project]['upstream']
-            print("="*30)
-            print("CAUTION: REVERSE PUSH DETECTED")
-            print("="*30)
+            message = "CAUTION: REVERSE PUSH DETECTED"
+            print("="*len(message))
+            print("\033[91m{}\033[00m".format(message))
+            print("="*len(message))
             question = upstream_repo + "==>" + \
                       downstream_repo + " YES/NO: "
             if not confirm_user(question):
