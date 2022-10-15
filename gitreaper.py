@@ -87,8 +87,16 @@ class GitReaper(object):
         ymlconfig = self.parseConfigFile(configfile)
         upstream_repo = ymlconfig[project]["upstream"]
         downstream_repo = ymlconfig[project]["url"]
+        flags = ymlconfig[project].get("flags") or ""
 
         if reverse:
+            if "reverse" not in flags:
+                print(
+                    "set 'flags: [reverse]' for {} if you want to sync from downstream to upstream".format(
+                        project
+                    )
+                )
+                sys.exit(1)
             upstream_repo = ymlconfig[project]["url"]
             downstream_repo = ymlconfig[project]["upstream"]
             message = "CAUTION: REVERSE PUSH DETECTED"
@@ -151,7 +159,7 @@ def main():
     parser.add_argument(
         "-R",
         "--reverse",
-        help="Reverse sync direction. Sync downstream to upstream",
+        help="Reverse sync direction. Sync downstream to upstream. It requires reverse to be set in flags field.",
         action="store_true",
         required=False,
     )
