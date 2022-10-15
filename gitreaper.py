@@ -23,9 +23,10 @@ import subprocess
 from argparse import ArgumentParser
 from contextlib import contextmanager
 
+
 @contextmanager
 def directoryAs(path):
-    oldpwd=os.getcwd()
+    oldpwd = os.getcwd()
     os.chdir(path)
     try:
         yield
@@ -42,33 +43,33 @@ def confirm_user(question):
 
 
 def get_temp_dir(project):
-        return tempfile.mkdtemp(prefix=('gitreaper-'+ project + '-'))
+    return tempfile.mkdtemp(prefix=("gitreaper-" + project + "-"))
 
 
 def clean_temp_dir(tempdir):
-        shutil.rmtree(tempdir)
+    shutil.rmtree(tempdir)
 
 
 def sync_entire_repo(project, upstream, downstream):
-    tempdir=get_temp_dir(project)
+    tempdir = get_temp_dir(project)
     with directoryAs(tempdir):
-        cmd = 'git clone --mirror ' + upstream + ' .'
+        cmd = "git clone --mirror " + upstream + " ."
         subprocess.call(cmd, shell=True)
-        cmd = 'git push -f -u ' + downstream
+        cmd = "git push -f -u " + downstream
         subprocess.call(cmd + " --all", shell=True)
         subprocess.call(cmd + " --tags", shell=True)
     clean_temp_dir(tempdir)
 
 
 def sync_specific_branches(project, upstream, downstream, branches):
-    tempdir=get_temp_dir(project)
+    tempdir = get_temp_dir(project)
     with directoryAs(tempdir):
-        cmd = 'git clone ' + upstream + ' .'
+        cmd = "git clone " + upstream + " ."
         subprocess.call(cmd, shell=True)
         for branch in branches:
-            cmd = 'git checkout ' + branch
+            cmd = "git checkout " + branch
             subprocess.call(cmd, shell=True)
-            cmd = 'git push -f -u ' + downstream + ' ' + branch
+            cmd = "git push -f -u " + downstream + " " + branch
             subprocess.call(cmd, shell=True)
     clean_temp_dir(tempdir)
 
@@ -84,18 +85,17 @@ class GitReaper(object):
     def sync(self, configfile, project, reverse):
         ymlconfig = ""
         ymlconfig = self.parseConfigFile(configfile)
-        upstream_repo = ymlconfig[project]['upstream']
-        downstream_repo = ymlconfig[project]['url']
+        upstream_repo = ymlconfig[project]["upstream"]
+        downstream_repo = ymlconfig[project]["url"]
 
         if reverse:
-            upstream_repo = ymlconfig[project]['url']
-            downstream_repo = ymlconfig[project]['upstream']
+            upstream_repo = ymlconfig[project]["url"]
+            downstream_repo = ymlconfig[project]["upstream"]
             message = "CAUTION: REVERSE PUSH DETECTED"
-            print("="*len(message))
+            print("=" * len(message))
             print("\033[91m{}\033[00m".format(message))
-            print("="*len(message))
-            question = upstream_repo + "==>" + \
-                      downstream_repo + " YES/NO: "
+            print("=" * len(message))
+            question = upstream_repo + "==>" + downstream_repo + " YES/NO: "
             try:
                 if not confirm_user(question):
                     sys.exit("sync aborted")
@@ -103,16 +103,22 @@ class GitReaper(object):
                 sys.exit("\nsync aborted")
 
         if "branches" in ymlconfig[project]:
-            question = upstream_repo + " ==> " + \
-                      downstream_repo + str(ymlconfig[project]['branches']) +" YES/NO: "
+            question = (
+                upstream_repo
+                + " ==> "
+                + downstream_repo
+                + str(ymlconfig[project]["branches"])
+                + " YES/NO: "
+            )
             question = "\033[91mBRANCH SYNC:\033[00m{}".format(question)
             try:
                 if not confirm_user(question):
                     sys.exit("sync aborted")
             except:
                 sys.exit("\nsync aborted")
-            sync_specific_branches(project, upstream_repo, downstream_repo,
-                                   ymlconfig[project]['branches'])
+            sync_specific_branches(
+                project, upstream_repo, downstream_repo, ymlconfig[project]["branches"]
+            )
         else:
             sync_entire_repo(project, upstream_repo, downstream_repo)
 
@@ -123,25 +129,36 @@ class GitReaper(object):
 def main():
     reaper = GitReaper()
     parser = ArgumentParser()
-    parser.add_argument('-c', "--config", dest='config_file',
-                                help="Master configuration file",
-                                action='store',
-                                required=True)
-    parser.add_argument('-p', "--project", dest='project',
-                                help="Project to work on",
-                                action='store',
-                                required=True)
-    parser.add_argument("--sync",
-                                help="Sync fork with upstream",
-                                action='store_true',
-                                required=False)
-    parser.add_argument("-R", "--reverse",
-                                help="Reverse sync direction. Sync downstream to upstream",
-                                action='store_true',
-                                required=False)
+    parser.add_argument(
+        "-c",
+        "--config",
+        dest="config_file",
+        help="Master configuration file",
+        action="store",
+        required=True,
+    )
+    parser.add_argument(
+        "-p",
+        "--project",
+        dest="project",
+        help="Project to work on",
+        action="store",
+        required=True,
+    )
+    parser.add_argument(
+        "--sync", help="Sync fork with upstream", action="store_true", required=False
+    )
+    parser.add_argument(
+        "-R",
+        "--reverse",
+        help="Reverse sync direction. Sync downstream to upstream",
+        action="store_true",
+        required=False,
+    )
     args = parser.parse_args()
     if args.sync:
         reaper.sync(args.config_file, args.project, args.reverse)
+
 
 if __name__ == "__main__":
     main()
