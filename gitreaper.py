@@ -100,6 +100,11 @@ class GitReaper(object):
                 sys.exit("sync aborted")
 
         if "branches" in ymlconfig[project]:
+            question = upstream_repo + " ==> " + \
+                      downstream_repo + str(ymlconfig[project]['branches']) +" YES/NO: "
+            question = "\033[91mBRANCH SYNC:\033[00m{}".format(question)
+            if not confirm_user(question):
+                sys.exit("sync aborted")
             sync_specific_branches(project, upstream_repo, downstream_repo,
                                    ymlconfig[project]['branches'])
         else:
