@@ -61,7 +61,7 @@ def sync_entire_repo(project, upstream, downstream):
     clean_temp_dir(tempdir)
 
 
-def sync_specific_branches(project, upstream, downstream, branches):
+def sync_specific_branches(project, upstream, downstream, branches, force=False):
     tempdir = get_temp_dir(project)
     with directoryAs(tempdir):
         cmd = "git clone " + upstream + " ."
@@ -69,7 +69,9 @@ def sync_specific_branches(project, upstream, downstream, branches):
         for branch in branches:
             cmd = "git checkout " + branch
             subprocess.call(cmd, shell=True)
-            cmd = "git push -f -u " + downstream + " " + branch
+            cmd = "git push -u " + downstream + " " + branch
+            if force:
+                cmd = cmd + " -f"
             subprocess.call(cmd, shell=True)
     clean_temp_dir(tempdir)
 
@@ -88,6 +90,9 @@ class GitReaper(object):
         upstream_repo = ymlconfig[project]["upstream"]
         downstream_repo = ymlconfig[project]["url"]
         flags = ymlconfig[project].get("flags") or ""
+        force = False
+        if "force" in flags:
+            force = True
 
         if reverse:
             if "reverse" not in flags:
@@ -125,7 +130,11 @@ class GitReaper(object):
             except:
                 sys.exit("\nsync aborted")
             sync_specific_branches(
-                project, upstream_repo, downstream_repo, ymlconfig[project]["branches"]
+                project,
+                upstream_repo,
+                downstream_repo,
+                ymlconfig[project]["branches"],
+                force
             )
         else:
             sync_entire_repo(project, upstream_repo, downstream_repo)
