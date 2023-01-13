@@ -129,9 +129,11 @@ class GitReaper(object):
             question = "{} {}".format(question, " YES/NO: ")
             try:
                 if not confirm_user(question):
-                    sys.exit("sync aborted")
+                    print("sync aborted")
+                    return
             except KeyboardInterrupt:
-                sys.exit("\nsync aborted")
+                print("\nsync aborted")
+                return
             sync_specific_branches(
                 project,
                 upstream_repo,
