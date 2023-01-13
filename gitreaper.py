@@ -138,6 +138,18 @@ class GitReaper(object):
                 force
             )
         else:
+            question = (
+                upstream_repo
+                + " ==> "
+                + downstream_repo
+                + " YES/NO: "
+            )
+            question = "\033[91mBRANCH SYNC:\033[00m{}".format(question)
+            try:
+                if not confirm_user(question):
+                    sys.exit("sync aborted")
+            except KeyboardInterrupt:
+                sys.exit("\nsync aborted")
             sync_entire_repo(project, upstream_repo, downstream_repo)
 
     def sync(self, configfile, project, reverse):
