@@ -86,9 +86,7 @@ class GitReaper(object):
         with open(os.path.abspath(configfile)) as file:
             return yaml.load(file, Loader=yaml.FullLoader)
 
-    def sync(self, configfile, project, reverse):
-        ymlconfig = ""
-        ymlconfig = self.parseConfigFile(configfile)
+    def _repo_sync(self, project, ymlconfig):
         upstream_repo = ymlconfig[project]["upstream"]
         downstream_repo = ymlconfig[project]["url"]
         flags = ymlconfig[project].get("flags") or ""
@@ -142,6 +140,15 @@ class GitReaper(object):
         else:
             sync_entire_repo(project, upstream_repo, downstream_repo)
 
+    def sync(self, configfile, project, reverse):
+        ymlconfig = ""
+        ymlconfig = self.parseConfigFile(configfile)
+        if project is None:
+            for project_entry in ymlconfig:
+                self._repo_sync(project_entry, ymlconfig)
+        else:
+            self._repo_sync(project, ymlconfig)
+
     def sendPatchUpstream(self, configfile, project):
         return
 
@@ -154,14 +161,6 @@ def main():
         "--config",
         dest="config_file",
         help="Master configuration file",
-        action="store",
-        required=True,
-    )
-    parser.add_argument(
-        "-p",
-        "--project",
-        dest="project",
-        help="Project to work on",
         action="store",
         required=True,
     )
@@ -180,6 +179,20 @@ def main():
                 """,
         action="store_true",
         required=False,
+    )
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "-p",
+        "--project",
+        dest="project",
+        help="Project to work on",
+        action="store",
+    )
+    group.add_argument(
+        "-a",
+        "--all",
+        help="Sync all projects",
+        action="store_true",
     )
     args = parser.parse_args()
     if args.sync:
