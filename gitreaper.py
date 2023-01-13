@@ -86,7 +86,7 @@ class GitReaper(object):
         with open(os.path.abspath(configfile)) as file:
             return yaml.load(file, Loader=yaml.FullLoader)
 
-    def _repo_sync(self, project, ymlconfig):
+    def _repo_sync(self, project, ymlconfig, reverse):
         upstream_repo = ymlconfig[project]["upstream"]
         downstream_repo = ymlconfig[project]["url"]
         flags = ymlconfig[project].get("flags") or ""
@@ -145,9 +145,9 @@ class GitReaper(object):
         ymlconfig = self.parseConfigFile(configfile)
         if project is None:
             for project_entry in ymlconfig:
-                self._repo_sync(project_entry, ymlconfig)
+                self._repo_sync(project_entry, ymlconfig, reverse)
         else:
-            self._repo_sync(project, ymlconfig)
+            self._repo_sync(project, ymlconfig, reverse)
 
     def sendPatchUpstream(self, configfile, project):
         return
