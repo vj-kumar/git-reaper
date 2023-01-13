@@ -168,7 +168,7 @@ def main():
         "--sync",
         help="Sync fork with upstream",
         action="store_true",
-        required=False,
+        required=True,
     )
     parser.add_argument(
         "-R",
