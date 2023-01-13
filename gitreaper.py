@@ -122,9 +122,11 @@ class GitReaper(object):
                 + " ==> "
                 + downstream_repo
                 + str(ymlconfig[project]["branches"])
-                + " YES/NO: "
             )
             question = "\033[91mBRANCH SYNC:\033[00m{}".format(question)
+            if force:
+                question = "{} \033[91m{}\033[00m".format(question, "[FORCE]")
+            question = "{} {}".format(question, " YES/NO: ")
             try:
                 if not confirm_user(question):
                     sys.exit("sync aborted")
